@@ -41,4 +41,10 @@ public static class ServiceExtensions
         services.AddScoped<MlPredictionService>();
         return services;
     }
+
+    public static IServiceCollection AddMlBacktestService(this IServiceCollection services)
+    {
+        services.AddScoped<MLBacktestService>();
+        return services;
+    }
 }

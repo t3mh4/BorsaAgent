@@ -10,17 +10,15 @@ public class StockFeatureConfiguration : IEntityTypeConfiguration<StockFeature>
     {
         entity.ToView("v_stock_features");
         entity.HasNoKey();
-        entity.Property(x => x.ClosePrice).HasColumnType("real");
-        entity.Property(x => x.OpenPrice).HasColumnType("real");
-        entity.Property(x => x.HighPrice).HasColumnType("real");
-        entity.Property(x => x.LowPrice).HasColumnType("real");
-        entity.Property(x => x.ClosePrice_Lag1).HasColumnType("real");
-        entity.Property(x => x.ClosePrice_Lag2).HasColumnType("real");
-        entity.Property(x => x.ClosePrice_Lag3).HasColumnType("real");
-        entity.Property(x => x.Volume_Lag1).HasColumnType("real");
-        entity.Property(x => x.SMA5).HasColumnType("real");
-        entity.Property(x => x.SMA20).HasColumnType("real");
+        entity.Property(x => x.PriceToSMA5).HasColumnType("real");
+        entity.Property(x => x.PriceToSMA20).HasColumnType("real");
+        entity.Property(x => x.SMA5ToSMA20).HasColumnType("real");
+        entity.Property(x => x.VolumeChange).HasColumnType("real");
         entity.Property(x => x.DailyReturn).HasColumnType("real");
         entity.Property(x => x.NextDayReturn).HasColumnType("real");
+        entity.Property(x => x.ClosePrice).HasColumnType("real");
+        entity.Property(x => x.Volume).HasColumnType("real");
+        entity.Property(x => x.SMA5).HasColumnType("real");
+        entity.Property(x => x.SMA20).HasColumnType("real");
     }
 }

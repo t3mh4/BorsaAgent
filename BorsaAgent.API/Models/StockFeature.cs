@@ -16,10 +16,26 @@ public class StockFeature
 
     public float SMA5 { get; set; }
     public float SMA20 { get; set; }
-
     public float Volume_Lag1 { get; set; }
 
     public float DailyReturn { get; set; }
-
     public float NextDayReturn { get; set; }
+
+    // ✅ Yeni Ratio Feature'lar
+    public float PriceToSMA5 { get; set; }
+    public float PriceToSMA20 { get; set; }
+    public float SMA5ToSMA20 { get; set; }
+    public float VolumeChange { get; set; }
+    // ✅ Gün içi Feature'lar
+    public float HighLowRange { get; set; }  // (High - Low) / Close — volatilite
+    public float OpenToClose { get; set; }   // (Close - Open) / Open * 100 — gün içi yön
+
+    // ✅ Yeni Teknik İndikatörler
+    public float RSI_14 { get; set; }
+    public float Momentum_5 { get; set; }
+    public float VolatilityRatio { get; set; }
+
+    // ✅ Classification Label (NextDayReturn > 1.5 → 1, değilse 0)
+    [Microsoft.ML.Data.NoColumn]
+    public bool IsPositive => NextDayReturn > 1.5f;
 }

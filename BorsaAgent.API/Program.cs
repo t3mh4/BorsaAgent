@@ -24,6 +24,7 @@ try
     builder.Services.AddDataCollectorServices();
     builder.Services.AddMlTrainingService();
     builder.Services.AddMlPredictionService();
+    builder.Services.AddMlBacktestService();
 
     // CORS Politikası (n8n veya Frontend erişimi için)
     builder.Services.AddCors(options =>
