@@ -35,6 +35,11 @@ public class StockFeature
     public float Momentum_5 { get; set; }
     public float VolatilityRatio { get; set; }
 
+    public float Bollinger_PercentB { get; set; }
+    public float MACD_Hist { get; set; }
+    public float ATR_Percent { get; set; }
+
+
     // ✅ Classification Label (NextDayReturn > 1.5 → 1, değilse 0)
     [Microsoft.ML.Data.NoColumn]
     public bool IsPositive => NextDayReturn > 1.5f;

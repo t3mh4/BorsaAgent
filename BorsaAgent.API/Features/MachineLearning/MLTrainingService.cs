@@ -21,17 +21,24 @@ public class MLTrainingService(IDbContextFactory<AppDbContext> dbFactory, ILogge
         var data = await db.StockFeatures
             .AsNoTracking()
             .Where(x => x.NextDayReturn != 0
-             && x.NextDayReturn > -15 && x.NextDayReturn < 15
-             && x.PriceToSMA5 > 0.5 && x.PriceToSMA5 < 1.5
-             && x.PriceToSMA20 > 0.5 && x.PriceToSMA20 < 1.5
-             && x.VolumeChange > 0 && x.VolumeChange < 20
-             && x.DailyReturn > -15 && x.DailyReturn < 15
-             && x.HighLowRange > 0 && x.HighLowRange < 0.15
-             && x.OpenToClose > -10 && x.OpenToClose < 10
-             && x.ClosePrice_Lag1 > 0
-             && x.ClosePrice_Lag2 > 0
-             && x.ClosePrice_Lag3 > 0
-             && x.Volume_Lag1 > 0)
+                    && x.NextDayReturn > -15
+                    && x.NextDayReturn < 15
+                    && x.PriceToSMA5 > 0.5
+                    && x.PriceToSMA5 < 1.5
+                    && x.PriceToSMA20 > 0.5
+                    && x.PriceToSMA20 < 1.5
+                    && x.VolumeChange > 0
+                    && x.VolumeChange < 20
+                    && x.DailyReturn > -15
+                    && x.DailyReturn < 15
+                    && x.HighLowRange > 0
+                    && x.HighLowRange < 0.15
+                    && x.OpenToClose > -10
+                    && x.OpenToClose < 10
+                    && x.ClosePrice_Lag1 > 0
+                    && x.ClosePrice_Lag2 > 0
+                    && x.ClosePrice_Lag3 > 0
+                    && x.Volume_Lag1 > 0)
             .ToListAsync(ct);
 
         if (data.Count == 0)
@@ -42,14 +49,14 @@ public class MLTrainingService(IDbContextFactory<AppDbContext> dbFactory, ILogge
 
         logger.LogInformation("Toplam veri: {Count}", data.Count);
 
-        // ── 1. REGRESYON MODELİ ──────────────────────────────────────────
+        // ── 1. REGRESYON MODELİ ────
         await TrainRegressionAsync(data, db, ct);
 
-        // ── 2. CLASSİFİCATİON MODELİ ────────────────────────────────────
+        // ── 2. CLASSİFİCATİON MODELİ ────
         await TrainClassificationAsync(data, db, ct);
     }
 
-    // ────────────────────────────────────────────────────────────────────
+    // ────
     private async Task TrainRegressionAsync(List<StockFeature> data,
         AppDbContext db, CancellationToken ct)
     {
@@ -74,7 +81,10 @@ public class MLTrainingService(IDbContextFactory<AppDbContext> dbFactory, ILogge
                 nameof(StockFeature.OpenToClose),
                 nameof(StockFeature.RSI_14),
                 nameof(StockFeature.Momentum_5),
-                nameof(StockFeature.VolatilityRatio)
+                nameof(StockFeature.VolatilityRatio),
+                nameof(StockFeature.Bollinger_PercentB),
+                nameof(StockFeature.MACD_Hist),
+                nameof(StockFeature.ATR_Percent)
             ))
             .Append(_mlContext.Transforms.NormalizeMeanVariance("Features"))
             .Append(_mlContext.Regression.Trainers.LightGbm(
@@ -109,7 +119,7 @@ public class MLTrainingService(IDbContextFactory<AppDbContext> dbFactory, ILogge
         logger.LogInformation("Regresyon modeli kaydedildi: {Path}", RegressionModelPath);
     }
 
-    // ────────────────────────────────────────────────────────────────────
+    // ────
     private async Task TrainClassificationAsync(List<StockFeature> data,
         AppDbContext db, CancellationToken ct)
     {
@@ -132,7 +142,9 @@ public class MLTrainingService(IDbContextFactory<AppDbContext> dbFactory, ILogge
             OpenToClose = x.OpenToClose,
             RSI_14 = x.RSI_14,
             Momentum_5 = x.Momentum_5,
-            VolatilityRatio = x.VolatilityRatio
+            ATR_Percent = x.ATR_Percent,
+            Bollinger_PercentB = x.Bollinger_PercentB,
+            MACD_Hist = x.MACD_Hist
         }).ToList();
 
         var dataView = _mlContext.Data.LoadFromEnumerable(classData);

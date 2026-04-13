@@ -32,7 +32,10 @@ public class MlPredictionService(IDbContextFactory<AppDbContext> dbFactory)
         OpenToClose = x.OpenToClose,
         RSI_14 = x.RSI_14,
         Momentum_5 = x.Momentum_5,
-        VolatilityRatio = x.VolatilityRatio
+        VolatilityRatio = x.VolatilityRatio,
+        Bollinger_PercentB = x.Bollinger_PercentB,
+        MACD_Hist = x.MACD_Hist,
+        ATR_Percent = x.ATR_Percent
     };
 
     // ── Predict (tek hisse) ────

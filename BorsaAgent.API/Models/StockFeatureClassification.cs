@@ -21,6 +21,9 @@ public class StockFeatureClassification
     public float RSI_14 { get; set; }
     public float Momentum_5 { get; set; }
     public float VolatilityRatio { get; set; }
+    public float Bollinger_PercentB { get; set; }
+    public float MACD_Hist { get; set; }
+    public float ATR_Percent { get; set; }
 }
 
 public class StockClassificationPrediction
