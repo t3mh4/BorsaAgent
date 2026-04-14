@@ -1,4 +1,5 @@
-﻿using BorsaAgent.API.Data;
+﻿using BorsaAgent.API.Constanst;
+using BorsaAgent.API.Data;
 using BorsaAgent.API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.ML;
@@ -18,27 +19,33 @@ public class MLTrainingService(IDbContextFactory<AppDbContext> dbFactory, ILogge
 
         await using var db = await dbFactory.CreateDbContextAsync(ct);
 
+        var newStockIds = await db.DailyPrices.GroupBy(x => x.StockId)
+            .Where(g => g.Count() < StockFilterConstants.MinListingDays)     
+            .Select(g => g.Key)
+            .ToListAsync(ct);
+
         var data = await db.StockFeatures
             .AsNoTracking()
-            .Where(x => x.NextDayReturn != 0
-                    && x.NextDayReturn > -15
-                    && x.NextDayReturn < 15
-                    && x.PriceToSMA5 > 0.5
-                    && x.PriceToSMA5 < 1.5
-                    && x.PriceToSMA20 > 0.5
-                    && x.PriceToSMA20 < 1.5
-                    && x.VolumeChange > 0
-                    && x.VolumeChange < 20
-                    && x.DailyReturn > -15
-                    && x.DailyReturn < 15
-                    && x.HighLowRange > 0
-                    && x.HighLowRange < 0.15
-                    && x.OpenToClose > -10
-                    && x.OpenToClose < 10
-                    && x.ClosePrice_Lag1 > 0
-                    && x.ClosePrice_Lag2 > 0
-                    && x.ClosePrice_Lag3 > 0
-                    && x.Volume_Lag1 > 0)
+            .Where(x => !newStockIds.Contains(x.StockId)
+                        && x.NextDayReturn != 0
+                        && x.NextDayReturn > -15
+                        && x.NextDayReturn < 15
+                        && x.PriceToSMA5 > 0.5
+                        && x.PriceToSMA5 < 1.5
+                        && x.PriceToSMA20 > 0.5
+                        && x.PriceToSMA20 < 1.5
+                        && x.VolumeChange > 0
+                        && x.VolumeChange < 20
+                        && x.DailyReturn > -15
+                        && x.DailyReturn < 15
+                        && x.HighLowRange > 0
+                        && x.HighLowRange < 0.15
+                        && x.OpenToClose > -10
+                        && x.OpenToClose < 10
+                        && x.ClosePrice_Lag1 > 0
+                        && x.ClosePrice_Lag2 > 0
+                        && x.ClosePrice_Lag3 > 0
+                        && x.Volume_Lag1 > 0)
             .ToListAsync(ct);
 
         if (data.Count == 0)

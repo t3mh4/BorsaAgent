@@ -22,7 +22,7 @@ public class YahooFinanceService(IHttpClientFactory httpClientFactory, IDbContex
 
         var stocks = await db.Stocks
             .AsNoTracking()
-            .Where(s => s.IsActive)
+            .Where(s => s.IsActive && s.ShortCode=="DOAS")
             .Select(s => new Stock { Id = s.Id, Code = s.Code })
             .ToListAsync(ct);
 
@@ -54,8 +54,8 @@ public class YahooFinanceService(IHttpClientFactory httpClientFactory, IDbContex
                 .AsNoTracking()
                 .Where(x => x.StockId == stock.Id)
                 .MaxAsync(x => (DateOnly?)x.TradeDate);
-
-            var period2Utc = DateTimeOffset.UtcNow;
+            var now = DateTime.Now.Date;
+            DateTimeOffset period2Utc = new(new DateTime(now.Year, now.Month, now.Day, 18, 30, 0, DateTimeKind.Utc));
 
             var period1 = lastDate.HasValue
                 ? new DateTimeOffset(lastDate.Value.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero).ToUnixTimeSeconds()
@@ -65,7 +65,7 @@ public class YahooFinanceService(IHttpClientFactory httpClientFactory, IDbContex
 
             var url = $"chart/{stock.Code}?interval={Interval}&period1={period1}&period2={period2}";
 
-            YahooFinanceResponse? response;
+            YahooFinanceResponse response;
             try
             {
                 response = await _httpClient.GetFromJsonAsync<YahooFinanceResponse>(url, ct);
@@ -99,11 +99,11 @@ public class YahooFinanceService(IHttpClientFactory httpClientFactory, IDbContex
             var count = new[]
             {
                 result.Timestamp.Count,
-                quote.Open?.Count ?? 0,
-                quote.High?.Count ?? 0,
-                quote.Low?.Count ?? 0,
-                quote.Close?.Count ?? 0,
-                quote.Volume?.Count ?? 0
+                quote.Open.Count,
+                quote.High.Count,
+                quote.Low.Count,
+                quote.Close.Count,
+                quote.Volume.Count
             }.Min();
 
             if (count == 0)
@@ -124,13 +124,9 @@ public class YahooFinanceService(IHttpClientFactory httpClientFactory, IDbContex
                 var c = quote.Close![i];
                 var v = quote.Volume![i];
 
-                if (o is null || h is null || l is null || c is null || v is null)
-                    continue;
+                var tradeDate = DateOnly.FromDateTime(DateTimeOffset.FromUnixTimeSeconds(result.Timestamp[i]).UtcDateTime);
 
-                var tradeDate = DateOnly.FromDateTime(
-                    DateTimeOffset.FromUnixTimeSeconds(result.Timestamp[i]).UtcDateTime);
-
-                rows.Add((tradeDate, o.Value, h.Value, l.Value, c.Value, v.Value, null));
+                rows.Add((tradeDate, o, h, l, c, v, null));
             }
 
             if (rows.Count == 0)
@@ -187,7 +183,7 @@ public class YahooFinanceService(IHttpClientFactory httpClientFactory, IDbContex
                     cmd.Parameters.Add(new NpgsqlParameter { NpgsqlDbType = NpgsqlDbType.Numeric, Value = r.l });
                     cmd.Parameters.Add(new NpgsqlParameter { NpgsqlDbType = NpgsqlDbType.Numeric, Value = r.c });
                     cmd.Parameters.Add(new NpgsqlParameter { NpgsqlDbType = NpgsqlDbType.Bigint, Value = r.v });
-                    cmd.Parameters.Add(new NpgsqlParameter { NpgsqlDbType = NpgsqlDbType.Numeric, Value = (object?)r.changePercent ?? DBNull.Value });
+                    cmd.Parameters.Add(new NpgsqlParameter { NpgsqlDbType = NpgsqlDbType.Numeric, Value = (object)r.changePercent ?? DBNull.Value });
                     cmd.Parameters.Add(new NpgsqlParameter { NpgsqlDbType = NpgsqlDbType.TimestampTz, Value = createdAtUtc });
 
                     batch.BatchCommands.Add(cmd);

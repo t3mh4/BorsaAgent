@@ -78,9 +78,15 @@ public class MlPredictionService(IDbContextFactory<AppDbContext> dbFactory)
         DateOnly finalDate = targetDate ?? (await db.DailyPrices.MaxAsync(x => (DateOnly?)x.TradeDate, ct) ?? DateOnly.FromDateTime(DateTime.Now));
         var lastPriceDateTime = DateTime.SpecifyKind(finalDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
 
+        var newStockIds = await db.DailyPrices.GroupBy(x => x.StockId)
+          .Where(g => g.Count() < StockFilterConstants.MinListingDays)
+          .Select(g => g.Key)
+          .ToListAsync(ct);
+
         var rawFeatures = await db.StockFeatures
             .AsNoTracking()
-            .Where(x => x.TradeDate == lastPriceDateTime
+            .Where(x => !newStockIds.Contains(x.StockId) 
+                    && x.TradeDate == lastPriceDateTime
                     && x.ClosePrice > StockFilterConstants.MinClosePrice
                     && x.Volume > StockFilterConstants.MinVolume
                     && x.ClosePrice > x.SMA5
