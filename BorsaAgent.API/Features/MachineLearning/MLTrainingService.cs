@@ -20,32 +20,32 @@ public class MLTrainingService(IDbContextFactory<AppDbContext> dbFactory, ILogge
         await using var db = await dbFactory.CreateDbContextAsync(ct);
 
         var newStockIds = await db.DailyPrices.GroupBy(x => x.StockId)
-            .Where(g => g.Count() < StockFilterConstants.MinListingDays)     
+            .Where(g => g.Count() < StockFilterConstants.MinListingDays)
             .Select(g => g.Key)
             .ToListAsync(ct);
 
         var data = await db.StockFeatures
             .AsNoTracking()
             .Where(x => !newStockIds.Contains(x.StockId)
-                        && x.NextDayReturn != 0
-                        && x.NextDayReturn > -15
-                        && x.NextDayReturn < 15
-                        && x.PriceToSMA5 > 0.5
-                        && x.PriceToSMA5 < 1.5
-                        && x.PriceToSMA20 > 0.5
-                        && x.PriceToSMA20 < 1.5
-                        && x.VolumeChange > 0
-                        && x.VolumeChange < 20
-                        && x.DailyReturn > -15
-                        && x.DailyReturn < 15
-                        && x.HighLowRange > 0
-                        && x.HighLowRange < 0.15
-                        && x.OpenToClose > -10
-                        && x.OpenToClose < 10
-                        && x.ClosePrice_Lag1 > 0
-                        && x.ClosePrice_Lag2 > 0
-                        && x.ClosePrice_Lag3 > 0
-                        && x.Volume_Lag1 > 0)
+                    && x.NextDayReturn != 0
+                    && x.NextDayReturn > -8   // Temettü/anomali şoklarını ele
+                    && x.NextDayReturn < 8    // Temettü/anomali şoklarını ele
+                    && x.PriceToSMA5 > 0.8   // Aşırı sapmaları daralt
+                    && x.PriceToSMA5 < 1.2
+                    && x.PriceToSMA20 > 0.7
+                    && x.PriceToSMA20 < 1.3
+                    && x.VolumeChange > 0.1  // Çok düşük hacimli günleri ele
+                    && x.VolumeChange < 10
+                    && x.DailyReturn > -8    // Temettü/anomali şoklarını ele
+                    && x.DailyReturn < 8
+                    && x.HighLowRange > 0
+                    && x.HighLowRange < 0.10 // Aşırı volatil günleri ele (%10'dan fazla marj)
+                    && x.OpenToClose > -7
+                    && x.OpenToClose < 7
+                    && x.ClosePrice_Lag1 > 0
+                    && x.ClosePrice_Lag2 > 0
+                    && x.ClosePrice_Lag3 > 0
+                    && x.Volume_Lag1 > 0)
             .ToListAsync(ct);
 
         if (data.Count == 0)
@@ -172,7 +172,10 @@ public class MLTrainingService(IDbContextFactory<AppDbContext> dbFactory, ILogge
                 nameof(StockFeatureClassification.OpenToClose),
                 nameof(StockFeatureClassification.RSI_14),
                 nameof(StockFeatureClassification.Momentum_5),
-                nameof(StockFeatureClassification.VolatilityRatio)
+                nameof(StockFeatureClassification.VolatilityRatio),
+                nameof(StockFeatureClassification.Bollinger_PercentB),
+                nameof(StockFeatureClassification.MACD_Hist),
+                nameof(StockFeatureClassification.ATR_Percent)
             )
             .Append(_mlContext.Transforms.NormalizeMeanVariance("Features"))
             .Append(_mlContext.BinaryClassification.Trainers.LightGbm(
