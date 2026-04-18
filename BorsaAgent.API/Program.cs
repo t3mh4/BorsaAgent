@@ -17,14 +17,10 @@ try
     // Veritabanı (PostgreSQL)
     builder.Services.AddDatabase(builder.Environment);
 
-    // HttpClientFactory (Bigpara & Yahoo)
+    // HttpClientFactory
     builder.Services.AddHttpClients();
 
-    // Feature Servisleri (DataCollector vb.)
-    builder.Services.AddDataCollectorServices();
-    builder.Services.AddMlTrainingService();
-    builder.Services.AddMlPredictionService();
-    builder.Services.AddMlBacktestService();
+    // Feature Servisleri
 
     // CORS Politikası (n8n veya Frontend erişimi için)
     builder.Services.AddCors(options =>
@@ -69,7 +65,7 @@ try
     // --- 3. Endpoint Mapping ---
     app.MapAllEndpoints();
 
-    app.MapGet("/", () => new { Status = "Online", Project = "Borsa Agent V1", Version = "1.0.0" });
+    app.MapGet("/", () => new { Status = "Online", Project = "Borsa Agent Init", Version = "0.0.0" });
 
     await app.RunAsync();
 }
