@@ -2,7 +2,7 @@
 using Serilog;
 using Serilog.Sinks.PostgreSQL.ColumnWriters;
 
-namespace BorsaAgent.API.Extensions;
+namespace BorsaAgent.API.Common.Extensions;
 
 public static class LoggingExtensions
 {

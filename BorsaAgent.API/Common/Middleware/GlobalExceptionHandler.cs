@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics;
 
-namespace BorsaAgent.API.Middleware;
+namespace BorsaAgent.API.Common.Middleware;
 
 public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {

@@ -1,13 +1,13 @@
-﻿using BorsaAgent.API.Data;
+﻿using BorsaAgent.API.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace BorsaAgent.API.Extensions;
+namespace BorsaAgent.API.Common.Extensions;
 
 public static class ServiceExtensions
 {
     public static IServiceCollection AddDatabase(this IServiceCollection services, IHostEnvironment environment)
     {
-        services.AddDbContextFactory<AppDbContext>(options =>
+        services.AddDbContextFactory<BorsaAgentDbContext>(options =>
         {
             options.UseNpgsql(DatabaseConfiguration.GetConnectionString());
 

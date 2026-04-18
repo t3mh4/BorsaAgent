@@ -1,4 +1,4 @@
-﻿namespace BorsaAgent.API.Extensions;
+﻿namespace BorsaAgent.API.Common.Extensions;
 
 public static class HttpClientExtensions
 {

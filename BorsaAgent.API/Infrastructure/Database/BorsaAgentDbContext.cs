@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace BorsaAgent.API.Data;
+namespace BorsaAgent.API.Infrastructure.Database;
 
-public class AppDbContext : DbContext
+public class BorsaAgentDbContext : DbContext
 {
 
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    public BorsaAgentDbContext(DbContextOptions<BorsaAgentDbContext> options) : base(options)
     {
     }
 
@@ -18,6 +18,6 @@ public class AppDbContext : DbContext
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(BorsaAgentDbContext).Assembly);
     }
 }

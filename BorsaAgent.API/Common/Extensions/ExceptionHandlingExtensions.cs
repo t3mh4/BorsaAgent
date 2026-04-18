@@ -1,6 +1,6 @@
-﻿using BorsaAgent.API.Middleware;
+﻿using BorsaAgent.API.Common.Middleware;
 
-namespace BorsaAgent.API.Extensions;
+namespace BorsaAgent.API.Common.Extensions;
 
 public static class ExceptionHandlingExtensions
 {

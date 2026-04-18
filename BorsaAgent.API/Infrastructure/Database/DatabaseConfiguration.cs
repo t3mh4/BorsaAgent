@@ -1,4 +1,4 @@
-﻿namespace BorsaAgent.API.Data;
+﻿namespace BorsaAgent.API.Infrastructure.Database;
 
 public static class DatabaseConfiguration
 {

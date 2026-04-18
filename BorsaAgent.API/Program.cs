@@ -1,4 +1,4 @@
-﻿using BorsaAgent.API.Extensions;
+﻿using BorsaAgent.API.Common.Extensions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
