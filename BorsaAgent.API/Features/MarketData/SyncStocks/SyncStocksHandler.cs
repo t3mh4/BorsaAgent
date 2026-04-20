@@ -1,7 +1,7 @@
 ﻿using BorsaAgent.API.Common;
 using BorsaAgent.API.Infrastructure.Database;
 using BorsaAgent.API.Infrastructure.Database.Models;
-using BorsaAgent.API.Infrastructure.TwelveDataClient;
+using BorsaAgent.API.Infrastructure.TwelveData;
 using Microsoft.EntityFrameworkCore;
 
 namespace BorsaAgent.API.Features.MarketData.SyncStocks;
@@ -9,12 +9,12 @@ namespace BorsaAgent.API.Features.MarketData.SyncStocks;
 public class SyncStocksHandler
 {
     private readonly BorsaAgentDbContext _dbContext;
-    private readonly ITwelveDataApiClient _twelveDataClient;
+    private readonly ITwelveDataClient _twelveDataClient;
     private readonly ILogger<SyncStocksHandler> _logger;
 
     public SyncStocksHandler(
         BorsaAgentDbContext dbContext,
-        ITwelveDataApiClient twelveDataClient,
+        ITwelveDataClient twelveDataClient,
         ILogger<SyncStocksHandler> logger)
     {
         _dbContext = dbContext;
@@ -28,8 +28,7 @@ public class SyncStocksHandler
         {
             _logger.LogInformation("BIST hisseleri senkronizasyonu başladı");
 
-            // TwelveData'dan hisseleri çek
-            List<StockInfo> bistStocks = await _twelveDataClient.GetBistStocksAsync(cancellationToken);
+            var bistStocks = await _twelveDataClient.GetBistStocksAsync(cancellationToken);
 
             if (bistStocks.Count == 0)
             {

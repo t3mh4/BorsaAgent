@@ -1,26 +1,26 @@
 ﻿using System.Text.Json;
 
-namespace BorsaAgent.API.Infrastructure.TwelveDataClient;
+namespace BorsaAgent.API.Infrastructure.TwelveData;
 
-public class TwelveDataApiClient : ITwelveDataApiClient
+public class TwelveDataClient : ITwelveDataClient
 {
     private readonly HttpClient _httpClient;
-    private readonly ILogger<TwelveDataApiClient> _logger;
+    private readonly ILogger<TwelveDataClient> _logger;
 
-    public TwelveDataApiClient(HttpClient httpClient, ILogger<TwelveDataApiClient> logger, IConfiguration configuration)
+    public TwelveDataClient(HttpClient httpClient, ILogger<TwelveDataClient> logger, IConfiguration configuration)
     {
         _httpClient = httpClient;
         _logger = logger;
     }
 
-    public async Task<List<StockInfo>> GetBistStocksAsync(CancellationToken cancellationToken = default)
+    public async Task<List<TwelveDataStockInfo>> GetBistStocksAsync(CancellationToken cancellationToken = default)
     {
         try
         {
             _logger.LogInformation("TwelveData'dan BIST hisseleri çekiliyor...");
 
-            var url = $"https://api.twelvedata.com/stocks?exchange=BIST";
-            var response = await _httpClient.GetAsync(url, cancellationToken);
+            var endpoint = $"?exchange=BIST";
+            var response = await _httpClient.GetAsync(endpoint, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {

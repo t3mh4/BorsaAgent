@@ -27,7 +27,7 @@ public static class LoggingExtensions
                   .ReadFrom.Services(services)
                   .WriteTo.PostgreSQL(
                       connectionString: connectionString,
-                      tableName: "Logs",
+                      tableName: "logs",
                       columnOptions: columnOptions,
                       needAutoCreateTable: true,
                       restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error
