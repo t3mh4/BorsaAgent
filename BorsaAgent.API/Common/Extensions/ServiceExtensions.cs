@@ -1,4 +1,5 @@
-﻿using BorsaAgent.API.Infrastructure.Database;
+﻿using BorsaAgent.API.Features.MarketData.SyncStocks;
+using BorsaAgent.API.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace BorsaAgent.API.Common.Extensions;
@@ -17,6 +18,12 @@ public static class ServiceExtensions
                 options.EnableSensitiveDataLogging();
             }
         });
+        return services;
+    }
+
+    public static IServiceCollection AddHandlers(this IServiceCollection services)
+    {
+        services.AddScoped<SyncStocksHandler>();
         return services;
     }
 }

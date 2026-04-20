@@ -1,4 +1,6 @@
 ﻿using BorsaAgent.API.Common.Extensions;
+using BorsaAgent.API.Features.MarketData.SyncStocks;
+using FluentValidation;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -22,6 +24,9 @@ try
 
     // Feature Servisleri
 
+    //Repolar
+    builder.Services.AddHandlers();
+
     // CORS Politikası (n8n veya Frontend erişimi için)
     builder.Services.AddCors(options =>
     {
@@ -38,6 +43,7 @@ try
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
+    builder.Services.AddValidatorsFromAssemblyContaining<Program>();
     var app = builder.Build();
 
     app.UseExceptionHandler();
@@ -65,7 +71,7 @@ try
     // --- 3. Endpoint Mapping ---
     app.MapAllEndpoints();
 
-    app.MapGet("/", () => new { Status = "Online", Project = "Borsa Agent Init", Version = "0.0.0" });
+    app.MapGet("/", () => new { Status = "Online", Project = "Borsa Agent V3", Version = "3.0.0" });
 
     await app.RunAsync();
 }
